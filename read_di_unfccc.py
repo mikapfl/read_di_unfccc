@@ -134,7 +134,7 @@ class UNFCCCSingleCategoryApiReader:
         year_ids: typing.List[int],
     ) -> typing.List[dict]:
 
-        if len(variable_ids) > 5000:
+        if len(variable_ids) > 3000:
             logging.warning(
                 "Your query parameters lead to a lot of variables selected at once. "
                 "If the query fails, try restricting your query more."
@@ -157,6 +157,7 @@ class UNFCCCSingleCategoryApiReader:
         classifications: typing.Union[None, typing.List[str]] = None,
         measure_ids: typing.Union[None, typing.List[int]] = None,
         gases: typing.Union[None, typing.List[str]] = None,
+        batch_size: int = 1000,
     ) -> pd.DataFrame:
         """Query the UNFCCC for data.
         :param party_codes:      list of ISO codes of the parties to query.
@@ -169,23 +170,34 @@ class UNFCCCSingleCategoryApiReader:
                                  Default: query for all measures.
         :param gases:            list of gases to query. For possible values, see .gases .
                                  Default: query for all gases.
+        :param batch_size:       number of variables to query in a single API query in the same batch to avoid internal
+                                 server errors. Larger queries are split automatically.
         """
         party_ids = []
         for code in party_codes:
             party_ids.append(self._name_id(self.parties, code, key="code"))
 
+        # always query all years
+        year_ids = list(self.years.index)
+
         variable_ids = self._select_variable_ids(
             classifications, category_ids, measure_ids, gases
         )
 
-        # always query all years
-        year_ids = list(self.years.index)
+        i = 0
+        raw_response = []
+        while i < len(variable_ids):
+            batched_variable_ids = variable_ids[i : i + batch_size]
+            i += batch_size
 
-        raw = self._flexible_query(
-            variable_ids=variable_ids, party_ids=party_ids, year_ids=year_ids
-        )
+            batched_response = self._flexible_query(
+                variable_ids=batched_variable_ids,
+                party_ids=party_ids,
+                year_ids=year_ids,
+            )
+            raw_response += batched_response
 
-        return self._parse_raw_answer(raw)
+        return self._parse_raw_answer(raw_response)
 
     def _parse_raw_answer(self, raw: typing.List[dict]) -> pd.DataFrame:
         data = []
