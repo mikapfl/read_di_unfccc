@@ -80,6 +80,9 @@ class UNFCCCSingleCategoryApiReader:
             .sort_index()
         )
         self._years_dict = dict(self.years["name"])
+        for i in self._years_dict:
+            if self._years_dict[i].startswith("Last Inventory Year"):
+                self._years_dict[i] = self._years_dict[i][-5:-1]
 
         # note that category names are not unique!
         category_hierarchy = self._get("dimension-instances/category")[party_category][
