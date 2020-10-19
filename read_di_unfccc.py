@@ -28,12 +28,19 @@ class UNFCCCApiReader:
             ~self.gases.index.duplicated(keep="first")
         ]  # drop duplicated gases
 
-    def query(self, *, party_code, gases=None):
+    def query(
+        self,
+        *,
+        party_code: str,
+        gases: typing.Union[typing.List[str], None] = None,
+        progress: bool = False,
+    ):
         """Query the UNFCCC for data.
         :param party_code:       ISO codes of a party for which to query.
                                  For possible values, see .parties .
         :param gases:            list of gases to query for. For possible values, see .gases .
                                  Default: query for all gases.
+        :param progress:         Display a progress bar. Requires tqdm.
 
         If you need more fine-grained control over which variables to query for, including restricting the query
         to specific measures, categories, or classifications or to query for multiple parties at once, please see the
@@ -46,7 +53,7 @@ class UNFCCCApiReader:
         else:
             raise KeyError(party_code)
 
-        return reader.query(party_codes=[party_code], gases=gases)
+        return reader.query(party_codes=[party_code], gases=gases, progress=progress)
 
 
 class UNFCCCSingleCategoryApiReader:
@@ -158,6 +165,7 @@ class UNFCCCSingleCategoryApiReader:
         measure_ids: typing.Union[None, typing.List[int]] = None,
         gases: typing.Union[None, typing.List[str]] = None,
         batch_size: int = 1000,
+        progress: bool = False,
     ) -> pd.DataFrame:
         """Query the UNFCCC for data.
         :param party_codes:      list of ISO codes of the parties to query.
@@ -172,6 +180,7 @@ class UNFCCCSingleCategoryApiReader:
                                  Default: query for all gases.
         :param batch_size:       number of variables to query in a single API query in the same batch to avoid internal
                                  server errors. Larger queries are split automatically.
+        :param progress:         show a progress bar. Requires tqdm.
         """
         party_ids = []
         for code in party_codes:
@@ -186,6 +195,11 @@ class UNFCCCSingleCategoryApiReader:
 
         i = 0
         raw_response = []
+        if progress:
+            import tqdm
+
+            pbar = tqdm.tqdm(total=len(variable_ids))
+
         while i < len(variable_ids):
             batched_variable_ids = variable_ids[i : i + batch_size]
             i += batch_size
@@ -196,6 +210,11 @@ class UNFCCCSingleCategoryApiReader:
                 year_ids=year_ids,
             )
             raw_response += batched_response
+            if progress:
+                pbar.update(len(batched_variable_ids))
+
+        if progress:
+            pbar.close()
 
         return self._parse_raw_answer(raw_response)
 
