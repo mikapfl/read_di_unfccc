@@ -2,46 +2,98 @@ import requests
 import pandas as pd
 import treelib
 import typing
+import logging
 
 
-class UNFCCCApiReaderNonAnnexOne:
-    """Provides access to the NonAnnexOne API of the UNFCCC data access using flexible queries, like
-    https://di.unfccc.int/flex_non_annex1 ."""
+class UNFCCCApiReader:
+    """Provides simplified unified access to the Flexible Query API of the UNFCCC data access for all parties.
+    Essentially encapsulates https://di.unfccc.int/flex_non_annex1 and https://di.unfccc.int/flex_annex1 ."""
+    def __init__(self, *, base_url="https://di.unfccc.int/api/"):
+        self.annex_one_reader = UNFCCCSingleCategoryApiReader(party_category='annexOne', base_url=base_url)
+        self.non_annex_one_reader = UNFCCCSingleCategoryApiReader(party_category='nonAnnexOne', base_url=base_url)
 
-    def __init__(self, base_url="https://di.unfccc.int/api/"):
+        self.parties = pd.concat([self.annex_one_reader.parties, self.non_annex_one_reader.parties]).sort_index()
+        self.gases = pd.concat([self.annex_one_reader.gases, self.non_annex_one_reader.gases]).sort_index()
+        self.gases = self.gases[~self.gases.index.duplicated(keep="first")]  # drop duplicated gases
+
+    def query(self, *, party_code, gases=None):
+        """Query the UNFCCC for data.
+        :param party_code:       ISO codes of a party for which to query.
+                                 For possible values, see .parties .
+        :param gases:            list of gases to query for. For possible values, see .gases .
+                                 Default: query for all gases.
+
+        If you need more fine-grained control over which variables to query for, including restricting the query
+        to specific measures, categories, or classifications or to query for multiple parties at once, please see the
+        corresponding methods .annex_one_reader.query and .non_annex_one_reader.query .
+        """
+        if party_code in self.annex_one_reader.parties['code'].values:
+            reader = self.annex_one_reader
+        elif party_code in self.non_annex_one_reader.parties['code'].values:
+            reader = self.non_annex_one_reader
+        else:
+            raise KeyError(party_code)
+
+        return reader.query(party_codes=[party_code], gases=gases)
+
+
+class UNFCCCSingleCategoryApiReader:
+    """Provides access to the Flexible Query API of the UNFCCC data access for a single category like nonAnnexOne.
+    Essentially encapsulates https://di.unfccc.int/flex_non_annex1 or https://di.unfccc.int/flex_annex1 ."""
+
+    def __init__(self, *, party_category: str, base_url="https://di.unfccc.int/api/"):
+        """
+        :param party_category: either 'nonAnnexOne' or 'annexOne'.
+        :param base_url: URL where the API is accessible (default: https://di.unfccc.int/api/).
+        """
         self.base_url = base_url
 
-        self.parties = pd.DataFrame(self._get("parties/nonAnnexOne")[0]["parties"]).set_index("id").sort_index()
-        self.years = pd.DataFrame(self._get("years/single")["nonAnnexOne"]).set_index("id").sort_index()
+        parties_raw = self._get(f"parties/{party_category}")
+        parties_entry = None
+        for entry in parties_raw:
+            if entry["categoryCode"] == party_category:
+                parties_entry = entry
+        if parties_entry is None:
+            raise ValueError(f"Could not find parties for the party_category {party_category!r}.")
+
+        self.parties = pd.DataFrame(parties_entry["parties"]).set_index("id").sort_index()
+        self.years = pd.DataFrame(self._get("years/single")[party_category]).set_index("id").sort_index()
 
         # note that category names are not unique!
-        category_hierarchy = self._get("dimension-instances/category")["nonAnnexOne"][0]
+        category_hierarchy = self._get("dimension-instances/category")[party_category][0]
         self.category_tree = self._walk(category_hierarchy)
 
         self.classifications = (
-            pd.DataFrame(self._get("dimension-instances/classification")["nonAnnexOne"]).set_index("id").sort_index()
+            pd.DataFrame(self._get("dimension-instances/classification")[party_category]).set_index("id").sort_index()
         )
 
-        measure_hierarchy = self._get("dimension-instances/measure")["nonAnnexOne"]
+        measure_hierarchy = self._get("dimension-instances/measure")[party_category]
         self.measure_tree = treelib.Tree()
         sr = self.measure_tree.create_node("__root__")
         for i in range(len(measure_hierarchy)):
             self._walk(measure_hierarchy[i], tree=self.measure_tree, parent=sr)
 
-        self.gases = pd.DataFrame(self._get("dimension-instances/gas")["nonAnnexOne"]).set_index("id").sort_index()
+        self.gases = pd.DataFrame(self._get("dimension-instances/gas")[party_category]).set_index("id").sort_index()
 
         unit_info = self._get("conversion/fq")
         self.units = pd.DataFrame(unit_info["units"]).set_index("id").sort_index()
-        self.conversion_factors = pd.DataFrame(unit_info["nonAnnexOne"])
+        self.conversion_factors = pd.DataFrame(unit_info[party_category])
 
         # variable IDs are not unique, because category names are not unique
         # just give up and delete the duplicated ones
-        self.variables = pd.DataFrame(self._get("variables/fq/nonAnnexOne")).set_index("variableId").sort_index()
+        self.variables = pd.DataFrame(self._get(f"variables/fq/{party_category}")).set_index("variableId").sort_index()
         self.variables = self.variables[~self.variables.index.duplicated(keep="first")]
 
     def _flexible_query(
         self, *, variable_ids: typing.List[int], party_ids: typing.List[int], year_ids: typing.List[int]
     ) -> typing.List[dict]:
+
+        if len(variable_ids) > 5000:
+            logging.warning(
+                "Your query parameters lead to a lot of variables selected at once. "
+                "If the query fails, try restricting your query more."
+            )
+
         return self._post(
             "records/flexible-queries", json={"variableIds": variable_ids, "partyIds": party_ids, "yearIds": year_ids}
         )
@@ -56,7 +108,7 @@ class UNFCCCApiReaderNonAnnexOne:
         gases: typing.Union[None, typing.List[str]] = None,
     ) -> pd.DataFrame:
         """Query the UNFCCC for data.
-        :param party_codes:      list of ISO codes of the Non-Annex-1 parties to query.
+        :param party_codes:      list of ISO codes of the parties to query.
                                  For possible values, see .parties .
         :param category_ids:     list of category IDs to query. For possible values, see .show_category_hierarchy().
                                  Default: query for all categories.
@@ -170,16 +222,30 @@ class UNFCCCApiReaderNonAnnexOne:
         return tree
 
     def _get(self, component: str) -> typing.Union[dict, list]:
-        return requests.get(self.base_url + component).json()
+        resp = requests.get(self.base_url + component)
+        resp.raise_for_status()
+        return resp.json()
 
     def _post(self, component: str, json: dict) -> typing.List[dict]:
-        return requests.post(self.base_url + component, json=json).json()
+        resp = requests.post(self.base_url + component, json=json)
+        resp.raise_for_status()
+        return resp.json()
 
 
-def _smoketest():
-    r = UNFCCCApiReaderNonAnnexOne()
+def _smoketest_non_annex_one():
+    r = UNFCCCSingleCategoryApiReader(party_category='nonAnnexOne')
     ans = r.query(party_codes=["AFG"])
 
 
+def _smoketest_annex_one():
+    r = UNFCCCSingleCategoryApiReader(party_category="annexOne")
+    ans = r.query(party_codes=["DEU"], gases=["N₂O"])
+
+
+def _smoketest_unified():
+    r = UNFCCCApiReader()
+    ans = r.query(party_code='AFG')
+
+
 if __name__ == "__main__":
-    _smoketest()
+    _smoketest_annex_one()
