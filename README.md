@@ -1,5 +1,16 @@
 Dataset containing all data available from the UNFCCC API at https://di.unfccc.int. Also includes a small library to query the UNFCCC API for a subset of the data and a script to re-download all of the data.
 
+Due to the large size of the full dataset, the dataset is shared using [datalad](https://www.datalad.org/), which is based on git. To enable downloading the data, clone the repository from [gin](https://gin.g-node.org/mikapfl/read_di_unfccc) using datalad:
+```shell
+$ datalad clone https://gin.g-node.org/mikapfl/read_di_unfccc
+```
+Then you can fetch the data using datalad:
+```shell
+$ cd read_di_unfccc
+$ datalad get data/*
+```
+You can learn more about datalad in the [datalad handbook](http://handbook.datalad.org).
+
 Sources of the data:
 Most of the data is GHG inventory data that the UNFCCC provides as received from the parties, for details see the [UNFCCC GHG data website](https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data).
 While all of the data included in this dataset is available from the UNFCCC API, some of the data is included by the UNFCCC from other sources:
