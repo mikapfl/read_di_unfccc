@@ -12,8 +12,8 @@ def main():
     r = UNFCCCApiReader()
     for party in tqdm.tqdm(r.parties["code"], desc="parties"):
         df = r.query(party_code=party, progress=True)
-        df.to_csv(ROOT_DIR / "outputs" / f"{party}.csv.gz", compression="gzip")
-        df.to_parquet(ROOT_DIR / "outputs" / f"{party}.parquet")
+        df.to_csv(ROOT_DIR / "data" / f"{party}.csv.gz", compression="gzip")
+        df.to_parquet(ROOT_DIR / "data" / f"{party}.parquet")
 
 
 if __name__ == "__main__":
