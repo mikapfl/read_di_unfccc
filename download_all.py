@@ -12,7 +12,7 @@ def main():
     for party in tqdm.tqdm(r.parties["code"], desc="parties"):
         df = r.query(party_code=party, progress=True)
 
-        annexI = party in r.annex_one_reader.parties["code"]
+        annexI = party in r.annex_one_reader.parties["code"].values
         subdir = "annexI" if annexI else "non-annexI"
         df.to_csv(ROOT_DIR / "data" / subdir / f"{party}.csv.gz", compression="gzip")
         df.to_parquet(ROOT_DIR / "data" / subdir / f"{party}.parquet")
