@@ -1,6 +1,5 @@
 import tqdm
 import os
-import pandas as pd
 import pathlib
 
 from read_di_unfccc import UNFCCCApiReader
@@ -12,8 +11,11 @@ def main():
     r = UNFCCCApiReader()
     for party in tqdm.tqdm(r.parties["code"], desc="parties"):
         df = r.query(party_code=party, progress=True)
-        df.to_csv(ROOT_DIR / "data" / f"{party}.csv.gz", compression="gzip")
-        df.to_parquet(ROOT_DIR / "data" / f"{party}.parquet")
+
+        annexI = party in r.annex_one_reader.parties["code"]
+        subdir = "annexI" if annexI else "non-annexI"
+        df.to_csv(ROOT_DIR / "data" / subdir / f"{party}.csv.gz", compression="gzip")
+        df.to_parquet(ROOT_DIR / "data" / subdir / f"{party}.parquet")
 
 
 if __name__ == "__main__":

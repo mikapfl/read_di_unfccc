@@ -246,7 +246,6 @@ class UNFCCCSingleCategoryApiReader:
 
             row = {
                 "party": self._parties_dict[dp["partyId"]],
-                "year": self._years_dict[dp["yearId"]],
                 "category": category,
                 "classification": self._classifications_dict[
                     variable["classificationId"]
@@ -254,12 +253,20 @@ class UNFCCCSingleCategoryApiReader:
                 "measure": self.measure_tree[variable["measureId"]].tag,
                 "gas": self._gases_dict[variable["gasId"]],
                 "unit": self._units_dict[variable["unitId"]],
+                "year": self._years_dict[dp["yearId"]],
                 "numberValue": dp["numberValue"],
                 "stringValue": dp["stringValue"],
             }
             data.append(row)
 
-        return pd.DataFrame(data)
+        df = pd.DataFrame(data)
+        df.sort_values(
+            ["party", "category", "classification", "measure", "gas", "unit", "year"],
+            inplace=True,
+        )
+        df.reset_index(inplace=True)
+
+        return df
 
     def _select_variable_ids(
         self, classifications, category_ids, measure_ids, gases
@@ -358,7 +365,7 @@ class UNFCCCSingleCategoryApiReader:
 
 def _smoketest_non_annex_one():
     r = UNFCCCSingleCategoryApiReader(party_category="nonAnnexOne")
-    ans = r.query(party_codes=["AFG"])
+    ans = r.query(party_codes=["MMR"])
 
 
 def _smoketest_annex_one():
