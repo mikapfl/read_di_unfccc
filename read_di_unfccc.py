@@ -264,7 +264,7 @@ class UNFCCCSingleCategoryApiReader:
             ["party", "category", "classification", "measure", "gas", "unit", "year"],
             inplace=True,
         )
-        df.reset_index(inplace=True)
+        df.reset_index(inplace=True, drop=True)
 
         return df
 
