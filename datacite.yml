@@ -19,13 +19,13 @@ authors:
 
 
 # A title to describe the published resource.
-title: "UNFCCC country-submitted greenhouse gas emissions data until 2020"
+title: "UNFCCC country-submitted greenhouse gas emissions data until 2020-10-25"
 
 # Additional information about the resource, e.g., a brief abstract.
 description: |
   Dataset containing all greenhouse gas emissions data submitted
   by countries under climate change convention (CRF data) as published by
-  the UNFCCC secretariat in June 2020.
+  the UNFCCC secretariat at 2020-10-25.
 
 # List of keywords the resource should be associated with.
 # Give as many keywords as possible, to make the resource findable.
