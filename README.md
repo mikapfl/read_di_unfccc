@@ -2,12 +2,12 @@ Dataset containing all data available from the UNFCCC API at https://di.unfccc.i
 
 Due to the large size of the full dataset, the dataset is shared using [datalad](https://www.datalad.org/), which is based on git. To download the data, see the dataset page on [gin](https://gin.g-node.org/mikapfl/read_di_unfccc) to download individual files from the data/ directory, or clone the whole dataset using datalad:
 ```shell
-$ datalad clone https://gin.g-node.org/mikapfl/read_di_unfccc
+$ datalad clone https://github.com/mikapfl/read_di_unfccc.git
 ```
 Then you can fetch the data using datalad:
 ```shell
 $ cd read_di_unfccc
-$ datalad get data/*
+$ datalad get -r .
 ```
 You can learn more about datalad in the [datalad handbook](http://handbook.datalad.org).
 
