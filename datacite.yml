@@ -1,0 +1,75 @@
+# Metadata for DOI registration according to DataCite Metadata Schema 4.1.
+# For detailed schema description see https://doi.org/10.5438/0014
+
+## Required fields
+
+# The main researchers involved. Include digital identifier (e.g., ORCID)
+# if possible, including the prefix to indicate its type.
+authors:
+  -
+    firstname: "Mika"
+    lastname: "Pflüger"
+    affiliation: "Potsdam Institute for Climate Impact Research (PIK)"
+    id: "ORCID:0000-0002-7814-8916"
+  -
+    firstname: "Johannes"
+    lastname: "Gütschow"
+    affiliation: "Potsdam Institute for Climate Impact Research (PIK)"
+    id: "ORCID:0000-0001-9944-3685"
+
+
+# A title to describe the published resource.
+title: "UNFCCC country-submitted greenhouse gas emissions data until 2020-10-25"
+
+# Additional information about the resource, e.g., a brief abstract.
+description: |
+  Dataset containing all greenhouse gas emissions data submitted
+  by countries under climate change convention (CRF data) as published by
+  the UNFCCC secretariat at 2020-10-25.
+
+# List of keywords the resource should be associated with.
+# Give as many keywords as possible, to make the resource findable.
+keywords:
+  - emissions data
+  - UNFCCC
+  - country-reported format
+  - greenhouse gas
+  - emission register
+
+# License information for this resource. Please provide the license name and/or a link to the license.
+# Please add also a corresponding LICENSE file to the repository.
+license:
+  name: "Apache License, Version 2.0"
+  url: "https://www.apache.org/licenses/LICENSE-2.0"
+
+rights: |
+  For population data, the original source is the UNSD Demographic Statistics accessible through
+  [UNdata](http://data.un.org), which must be referenced if re-using the data.
+  For GDP data, the original source is The World Bank, and the data is shared by
+  The World Bank using the CC-BY 4.0 License and pursuant to their
+  [terms of use](https://data.worldbank.org/summary-terms-of-use).
+
+
+
+# Related publications. reftype might be: IsSupplementTo, IsDescribedBy, IsReferencedBy.
+# Please provide digital identifier (e.g., DOI) if possible.
+# Add a prefix to the ID, separated by a colon, to indicate the source.
+# Supported sources are: DOI, arXiv, PMID
+# In the citation field, please provide the full reference, including title, authors, journal etc.
+references:
+  -
+    reftype: "IsDerivedFrom"
+    citation: "UNFCCC: Greenhouse Gas Inventory Data, available at https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data"
+  -
+    reftype: "IsDerivedFrom"
+    citation: "UNSD Demographic Statistics, available at http://data.un.org"
+  -
+    reftype: "IsDerivedFrom"
+    citation: "The World Bank GDP data, available at https://data.worldbank.org/"
+
+
+# Resource type. Default is Dataset, other possible values are Software, DataPaper, Image, Text.
+resourcetype: Dataset
+
+# Do not edit or remove the following line
+templateversion: 1.2
