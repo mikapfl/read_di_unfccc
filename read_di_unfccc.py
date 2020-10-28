@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import itertools
 import logging
 import typing
 
@@ -84,17 +85,20 @@ class UNFCCCSingleCategoryApiReader:
         self.base_url = base_url
 
         parties_raw = self._get(f"parties/{party_category}")
-        parties_entry = None
+        parties_entries = []
         for entry in parties_raw:
-            if entry["categoryCode"] == party_category:
-                parties_entry = entry
-        if parties_entry is None:
+            if entry["categoryCode"] == party_category and entry["name"] != "Groups":
+                parties_entries.append(entry["parties"])
+        if not parties_entries:
             raise ValueError(
                 f"Could not find parties for the party_category {party_category!r}."
             )
 
         self.parties = (
-            pd.DataFrame(parties_entry["parties"]).set_index("id").sort_index()
+            pd.DataFrame(itertools.chain(*parties_entries))
+            .set_index("id")
+            .sort_index()
+            .drop_duplicates()
         )
         self._parties_dict = dict(self.parties["code"])
         self.years = (
