@@ -1,4 +1,4 @@
-Dataset containing all data available from the UNFCCC API at https://di.unfccc.int. Also includes a small library to query the UNFCCC API for a subset of the data and a script to re-download all of the data.
+Dataset containing all data available from the UNFCCC API at https://di.unfccc.int as of 2020-10-28. Additionally, includes a small library to query the UNFCCC API for a subset of the data, and a script to refresh the data in case newer data is available.
 
 Due to the large size of the full dataset, the dataset is shared using [datalad](https://www.datalad.org/), which is based on git. To download the data, see the dataset page on [gin](https://gin.g-node.org/mikapfl/read_di_unfccc) to download individual files from the data/ directory, or clone the whole dataset using datalad:
 ```shell
@@ -13,7 +13,7 @@ You can learn more about datalad in the [datalad handbook](http://handbook.datal
 
 Sources of the data:
 Most of the data is GHG inventory data that the UNFCCC provides as received from the parties, for details see the [UNFCCC GHG data website](https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data).
-While all of the data included in this dataset is available from the UNFCCC API, some of the data is included by the UNFCCC from other sources:
+While all the data included in this dataset is available from the UNFCCC API, the UNFCCC includes some data from other sources:
 * For population data, the source is the UNSD Demographic Statistics accessible through [UNdata](http://data.un.org).
 * For GDP data, the primary source is The World Bank, and the data is shared by The World Bank using the  CC-BY 4.0 License and pursuant to their [terms of use](https://data.worldbank.org/summary-terms-of-use).
 
