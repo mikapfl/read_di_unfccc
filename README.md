@@ -11,11 +11,11 @@ $ datalad get -r .
 ```
 You can learn more about datalad in the [datalad handbook](http://handbook.datalad.org).
 
-Sources of the data:
-Most of the data is GHG inventory data that the UNFCCC provides as received from the parties, for details see the [UNFCCC GHG data website](https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data).
-While all the data included in this dataset is available from the UNFCCC API, the UNFCCC includes some data from other sources:
-* For population data, the source is the UNSD Demographic Statistics accessible through [UNdata](http://data.un.org).
-* For GDP data, the primary source is The World Bank, and the data is shared by The World Bank using the  CC-BY 4.0 License and pursuant to their [terms of use](https://data.worldbank.org/summary-terms-of-use).
+References:
+All the data included in this dataset is available from the UNFCC API, which sources the data from:
+* GHG inventory data: UNFCCC: Greenhouse Gas Inventory Data, available at https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data
+* Population data: UNSD Demographic Statistics, available at http://data.un.org
+* GDP data: The World Bank GDP data, available at https://data.worldbank.org/ and shared by The World Bank under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by/4.0/) and pusuant to their [terms of use](https://data.worldbank.org/summary-terms-of-use).
 
 If you want to use the library to download data from the UNFCCC API, check out the `example.ipynb` notebook for a simple usage example. To re-download all of the data, use the `download_all.py` script.
 

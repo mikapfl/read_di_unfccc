@@ -51,21 +51,17 @@ rights: |
 
 
 
-# Related publications. reftype might be: IsSupplementTo, IsDescribedBy, IsReferencedBy.
-# Please provide digital identifier (e.g., DOI) if possible.
-# Add a prefix to the ID, separated by a colon, to indicate the source.
-# Supported sources are: DOI, arXiv, PMID
-# In the citation field, please provide the full reference, including title, authors, journal etc.
-references:
-  -
-    reftype: "IsDerivedFrom"
-    citation: "UNFCCC: Greenhouse Gas Inventory Data, available at https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data"
-  -
-    reftype: "IsDerivedFrom"
-    citation: "UNSD Demographic Statistics, available at http://data.un.org"
-  -
-    reftype: "IsDerivedFrom"
-    citation: "The World Bank GDP data, available at https://data.worldbank.org/"
+# gin doesn't support "IsDerivedFrom" at the moment, so we can't make these references machine-readable atm.
+#references:
+#  -
+#    reftype: "IsDerivedFrom"
+#    citation: "UNFCCC: Greenhouse Gas Inventory Data, available at https://unfccc.int/process/transparency-and-reporting/greenhouse-gas-data/what-is-greenhouse-gas-data"
+#  -
+#    reftype: "IsDerivedFrom"
+#    citation: "UNSD Demographic Statistics, available at http://data.un.org"
+#  -
+#    reftype: "IsDerivedFrom"
+#    citation: "The World Bank GDP data, available at https://data.worldbank.org/"
 
 
 # Resource type. Default is Dataset, other possible values are Software, DataPaper, Image, Text.
