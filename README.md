@@ -1,4 +1,6 @@
-Dataset containing all data available from the UNFCCC API at https://di.unfccc.int as of 2020-10-28. Additionally, includes a small library to query the UNFCCC API for a subset of the data, and a script to refresh the data in case newer data is available.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4199622.svg)](https://doi.org/10.5281/zenodo.4199622)
+
+Dataset containing all data available from the UNFCCC API at https://di.unfccc.int as of 2020-10-25. Additionally, includes a small library to query the UNFCCC API for a subset of the data, and a script to refresh the data in case newer data is available.
 
 Due to the large size of the full dataset, the dataset is shared using [datalad](https://www.datalad.org/), which is based on git. To download the data, see the dataset page on [gin](https://gin.g-node.org/mikapfl/read_di_unfccc) to download individual files from the data/ directory, or clone the whole dataset using datalad:
 ```shell
